@@ -1,0 +1,19 @@
+{
+    "name": "garkavenkov/html-parser",
+    "description": "Parser for web-pages",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maksim Garkavenkov",
+            "email": "maksim.garkavenkov@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "WebUtils\\": "src/"
+        }
+    }
+}
