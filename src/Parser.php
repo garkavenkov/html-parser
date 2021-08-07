@@ -2,7 +2,7 @@
 
 namespace WebUtils;
 
-class Parser 
+class HtmlParser 
 {
 
     /**
