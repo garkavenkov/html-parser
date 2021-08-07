@@ -2,7 +2,7 @@
 
 namespace WebUtils;
 
-class Parser 
+class HtmlParser 
 {
 
     /**
@@ -148,7 +148,7 @@ class Parser
      * @param string $xpath
      * @return Parser
      */
-    public function select($xpath): Parser
+    public function select($xpath): HtmlParser
     {
         $this->content = $this->domxpath->query($xpath);
         return $this;
