@@ -108,7 +108,8 @@ class HtmlParser
                 if ($item->hasAttribute($attr)) {
  
                     $value = $this->host . $item->getAttribute($attr);
-
+                    $value = \str_replace(' ', '%20', $value);
+                    
                     if ($key) {
 
                         if (\is_array($key)) {
@@ -140,6 +141,23 @@ class HtmlParser
         }
         
         return $links;
+    }
+
+    public function getNodeText($attribute = null)
+    {
+        // return $this->content;
+        if ($this->content) {
+            // var_dump($this->content->count());
+            foreach($this->content as $node) {
+                if ($attribute) {
+                    return $node->$attribute;
+                } else {
+                    return $node->textContent;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
