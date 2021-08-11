@@ -46,9 +46,44 @@ class HtmlParser
      * @param string $url
      * @param array $options
      */
-    public function __construct($url, $options = [])
+    public function __construct()
+    {
+        // $this->url = $url;
+        
+        // $ch = curl_init();
+
+        // curl_setopt($ch, CURLOPT_URL, $url);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        // curl_setopt($ch, CURLOPT_HEADER, 0); 
+
+        // $content = curl_exec($ch);
+        // curl_close($ch);
+
+        // $this->dom = new \DOMDocument();
+        // // Get rid from spaces
+        // $this->dom->preserveWhiteSpace = false;
+        // libxml_use_internal_errors(true);
+        // $this->dom->loadHTML($content);
+        // libxml_use_internal_errors(false);
+
+        // $this->domxpath = new \DOMXPath($this->dom);
+
+        // $url_info = parse_url($this->url);
+
+        // if ($url_info) {
+        //     if (isset($url_info['scheme'])) {
+        //         $this->host .= $url_info['scheme'] . '://';
+        //     }
+        //     $this->host .= $url_info['host'] . '/';
+        // }
+
+
+    }
+
+    public function source($url, $options = [])
     {
         $this->url = $url;
+        $this->host = '';
         
         $ch = curl_init();
 
@@ -76,8 +111,8 @@ class HtmlParser
             }
             $this->host .= $url_info['host'] . '/';
         }
-
-
+        
+        return $this;
     }
 
     /**
