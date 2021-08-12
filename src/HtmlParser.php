@@ -213,7 +213,7 @@ class HtmlParser
      *
      * @return DOMNodeList
      */
-    public function getNodes(): DOMNodeList
+    public function getNodes()
     {
         return $this->content;
     }
