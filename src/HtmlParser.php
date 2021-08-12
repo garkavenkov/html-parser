@@ -41,46 +41,13 @@ class HtmlParser
     private $content;
 
     /**
-     * Constructor
+     * Initializes a new session and parse html.
      *
-     * @param string $url
-     * @param array $options
+     * @param string $url       Url
+     * @param array $options    Settings for curl
+     * @return HtmlParser
      */
-    public function __construct()
-    {
-        // $this->url = $url;
-        
-        // $ch = curl_init();
-
-        // curl_setopt($ch, CURLOPT_URL, $url);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        // curl_setopt($ch, CURLOPT_HEADER, 0); 
-
-        // $content = curl_exec($ch);
-        // curl_close($ch);
-
-        // $this->dom = new \DOMDocument();
-        // // Get rid from spaces
-        // $this->dom->preserveWhiteSpace = false;
-        // libxml_use_internal_errors(true);
-        // $this->dom->loadHTML($content);
-        // libxml_use_internal_errors(false);
-
-        // $this->domxpath = new \DOMXPath($this->dom);
-
-        // $url_info = parse_url($this->url);
-
-        // if ($url_info) {
-        //     if (isset($url_info['scheme'])) {
-        //         $this->host .= $url_info['scheme'] . '://';
-        //     }
-        //     $this->host .= $url_info['host'] . '/';
-        // }
-
-
-    }
-
-    public function source($url, $options = [])
+    public function source($url, $options = []): HtmlParser
     {
         $this->url = $url;
         $this->host = '';
@@ -126,13 +93,14 @@ class HtmlParser
     }
 
     /**
-     * Undocumented function
+     * Return array of URLs
      *
-     * @param String $attr
-     * @param mixed $key
+     * @param String $attr  Attribute name which will be used for determine URL 
+     * @param Boolean $relative Whether original URL contains host 
+     * @param mixed $key    Name for key in array
      * @return Array
      */
-    public function getURL($attr, $key = null): Array
+    public function getURL($attr, $relative = false, $key = null): Array
     {
         $links = [];
 
@@ -142,7 +110,12 @@ class HtmlParser
 
                 if ($item->hasAttribute($attr)) {
  
-                    $value = $this->host . $item->getAttribute($attr);
+                    $value = $item->getAttribute($attr);
+                    
+                    if ($relative) {
+                        $value = $this->host . $item->getAttribute($attr);
+                    }
+                    
                     $value = \str_replace(' ', '%20', $value);
                     
                     if ($key) {
@@ -178,28 +151,79 @@ class HtmlParser
         return $links;
     }
 
-    public function getNodeText($attribute = null)
-    {
-        // return $this->content;
+    /**
+     * Returns node's text value.
+     * 
+     * If there are several nodes, than function return array of values,
+     * otherwise function return string
+     *
+     * @param string $attribute Attibute name for text
+     * @return array|string
+     */
+    public function getNodeText($attribute = 'textContent')
+    {        
         if ($this->content) {
-            // var_dump($this->content->count());
-            foreach($this->content as $node) {
-                if ($attribute) {
-                    return $node->$attribute;
-                } else {
-                    return $node->textContent;
+            if ($this->content->count() > 1) {
+                $result = [];
+                foreach($this->content as $node) {                
+                    $result[] = $node->$attribute;
                 }
-            }
-        }
-
+                return $result;
+            } else {                
+                return $this->content[0]->$attribute;
+            }            
+        } 
         return null;
     }
+   
+
+    /**
+     * Returns assocciative array
+     *
+     * @param integer $in_row           Collumns count in a row
+     * @param integer $key              Position in the row which will be used as a key 
+     * @param integer $value            Position in the row which will be used as a value 
+     * @param string $key_attribute     Attibute name for key text. By default 'textContent'
+     * @param string $value_attribute   Attibute name for value text. By default 'textContent'
+     * @return Array
+     */
+    public function getAssocArray(int $in_row, int $key, int $value, string $key_attribute = 'textContent', string $value_attribute = 'textContent'): Array
+    {
+        $array = [];
+        
+        if ($this->content) {
+            $rows = $this->content->count() / $in_row;
+            
+            $current_key = $key;
+            $current_value = $value;
+
+            for ($i=0; $i <$rows ; $i++) { 
+                $array[$this->content[$current_key]->$key_attribute] = $this->content[$current_value]->$value_attribute;
+                $current_key += $in_row;
+                $current_value += $in_row;
+            }
+        }
+        
+        return $array;
+
+    }
+
+    /**
+     * Returns result of query
+     *
+     * @return DOMNodeList
+     */
+    public function getNodes(): DOMNodeList
+    {
+        return $this->content;
+    }
+
 
     /**
      * Select nodes from DOMXPath 
      *
      * @param string $xpath
-     * @return Parser
+     * @return HtmlParser
      */
     public function select($xpath): HtmlParser
     {
